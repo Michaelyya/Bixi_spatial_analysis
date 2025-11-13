@@ -95,8 +95,8 @@ This will:
 
 ```python
 import sys, os
-sys.path.insert(0, r'/Users/yonganyu/Desktop/GEOG 414')
-os.chdir(r'/Users/yonganyu/Desktop/GEOG 414')
+sys.path.insert(0, r'U:\GEOG414\GEOG_414_final\Bixi_spatial_analysis')
+os.chdir(r'U:\GEOG414\GEOG_414_final\Bixi_spatial_analysis')
 from main_workflow import BIXIGenAIPipeline
 pipeline = BIXIGenAIPipeline()
 results = pipeline.run_full_pipeline(use_genai=True, create_map=True)
@@ -108,7 +108,7 @@ results = pipeline.run_full_pipeline(use_genai=True, create_map=True)
 2. Open Python window: `View` → `Python`
 3. Run:
 ```python
-exec(open(r'/Users/yonganyu/Desktop/GEOG 414/run_in_arcgis_pro.py').read())
+exec(open(r'U:\GEOG414\GEOG_414_final\Bixi_spatial_analysis\run_in_arcgis_pro.py').read())
 ```
 
 **Option 3: Create Script Tool**

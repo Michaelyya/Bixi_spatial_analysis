@@ -5,14 +5,14 @@ This script is designed to be run from ArcGIS Pro's Python window or as a script
 Usage in ArcGIS Pro Python Window:
 1. Open ArcGIS Pro
 2. View → Python (or Ctrl+Alt+P)
-3. Copy and paste this entire script, or run: exec(open(r'/Users/yonganyu/Desktop/GEOG 414/run_in_arcgis_pro.py').read())
+3. Copy and paste this entire script, or run: exec(open(r'U:\GEOG414\GEOG_414_final\Bixi_spatial_analysis\run_in_arcgis_pro.py').read())
 """
 import sys
 import os
 from pathlib import Path
 
 # Get the project directory (adjust this path if needed)
-PROJECT_DIR = Path(__file__).parent if '__file__' in globals() else Path(r'/Users/yonganyu/Desktop/GEOG 414')
+PROJECT_DIR = Path(__file__).parent if '__file__' in globals() else Path(r'U:\GEOG414\GEOG_414_final\Bixi_spatial_analysis')
 
 # Add project directory to Python path
 if str(PROJECT_DIR) not in sys.path:

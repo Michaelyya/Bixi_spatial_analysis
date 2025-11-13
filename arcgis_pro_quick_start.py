@@ -6,7 +6,7 @@ import sys
 import os
 
 # ===== CONFIGURE THIS PATH =====
-PROJECT_PATH = r'/Users/yonganyu/Desktop/GEOG 414'
+PROJECT_PATH = r'U:\GEOG414\GEOG_414_final\Bixi_spatial_analysis'
 # ================================
 
 # Setup
