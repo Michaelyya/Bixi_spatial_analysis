@@ -1,0 +1,39 @@
+{
+  "timestamp": "2025-11-13T12:57:50.844899",
+  "data_fetch": {
+    "success": true,
+    "num_stations": 1019,
+    "columns": [
+      "station_id",
+      "external_id",
+      "name",
+      "short_name",
+      "lat",
+      "lon",
+      "rental_methods",
+      "capacity",
+      "electric_bike_surcharge_waiver",
+      "is_charging_info",
+      "eightd_has_key_dispenser",
+      "has_kiosk",
+      "eightd_station_services",
+      "num_bikes_available",
+      "num_ebikes_available",
+      "num_bikes_disabled",
+      "num_docks_available",
+      "num_docks_disabled",
+      "is_installed",
+      "is_renting",
+      "is_returning",
+      "last_reported",
+      "eightd_has_available_keys",
+      "is_charging_status",
+      "eightd_active_station_services",
+      "total_capacity",
+      "utilization_rate"
+    ],
+    "csv_path": "data/latest_combined_20251113_125751.csv"
+  },
+  "genai_analysis": null,
+  "map_creation": null
+}
