@@ -6,19 +6,9 @@ from typing import Dict, Any
 
 
 class PromptManager:
-    """Manages prompts for different GenAI tasks"""
-    
+
     @staticmethod
     def get_data_analysis_prompt(data_summary: str) -> str:
-        """
-        Generate prompt for analyzing BIXI data
-        
-        Args:
-            data_summary: Summary statistics of the BIXI data
-        
-        Returns:
-            str: Formatted prompt
-        """
         return f"""You are a spatial data analyst specializing in bike-sharing systems. 
 Analyze the following BIXI (Montreal bike-sharing) data and provide insights:
 
@@ -35,16 +25,6 @@ Format your response in clear sections with actionable insights."""
 
     @staticmethod
     def get_map_design_prompt(analysis_results: str, data_summary: str) -> str:
-        """
-        Generate prompt for map design recommendations
-        
-        Args:
-            analysis_results: Results from data analysis
-            data_summary: Summary of the data
-        
-        Returns:
-            str: Formatted prompt
-        """
         return f"""You are a cartographic expert. Based on the following analysis of BIXI data:
 
 ANALYSIS RESULTS:

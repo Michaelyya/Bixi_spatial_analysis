@@ -39,16 +39,6 @@ class ArcPyMapper:
     def create_feature_class_from_csv(self, csv_path: str, output_fc: str, 
                                      x_field: str = None, y_field: str = None,
                                      spatial_reference: int = 4326):
-        """
-        Create a feature class from CSV with lat/lon coordinates
-        
-        Args:
-            csv_path: Path to CSV file
-            output_fc: Output feature class name/path
-            x_field: Field name for longitude (auto-detects if None)
-            y_field: Field name for latitude (auto-detects if None)
-            spatial_reference: EPSG code (default: 4326 for WGS84)
-        """
         try:
             # Read CSV to detect coordinate fields
             df = pd.read_csv(csv_path)

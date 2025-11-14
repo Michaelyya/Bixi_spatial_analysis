@@ -66,20 +66,8 @@ class BIXIDataFetcher:
         return pd.DataFrame()
     
     def get_combined_station_data(self):
-        """
-        Combine station information with real-time status
-        
-        Returns:
-            pd.DataFrame: Combined station data with geometry and status
-        """
         info_df = self.get_station_information()
         status_df = self.get_station_status()
-        
-        if info_df.empty or status_df.empty:
-            print("⚠ Warning: Missing station data")
-            return pd.DataFrame()
-        
-        # Merge on station_id
         combined = info_df.merge(
             status_df,
             on='station_id',
