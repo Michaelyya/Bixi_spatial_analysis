@@ -1,35 +1,38 @@
-# BIXI GenAI ArcGIS Pro Integration
+# BIXI GenAI Spatial Analysis
 
-A comprehensive pipeline that integrates BIXI (Montreal bike-sharing) data with Generative AI (OpenAI GPT models) and ArcGIS Pro for automated spatial analysis and map creation.
+A comprehensive pipeline that integrates BIXI (Montreal bike-sharing) data with Generative AI (OpenAI GPT models) and GIS (QGIS or ArcGIS Pro) for automated spatial analysis and map creation.
 
 ## Workflow
 
 ```
-BIXI Data → GenAI Analysis → ArcGIS Pro Spatial Analysis → Automated Map Creation
+BIXI Data → GenAI Analysis → GIS Spatial Analysis → Automated Map Creation
 ```
 
 ## Features
 
 - **Real-time BIXI Data Fetching**: Retrieves live station information and status from BIXI GBFS API
 - **GenAI Integration**: Uses OpenAI GPT models for data analysis, insights, and map design recommendations
-- **Automated ArcGIS Pro Mapping**: Creates maps, styles layers, and generates layouts using ArcPy
+- **Automated GIS Mapping**: Creates maps, styles layers, and generates layouts using QGIS (PyQGIS) or ArcGIS Pro (ArcPy)
 - **Systematic Automation**: Complete end-to-end pipeline with minimal manual intervention
 
 ## Project Structure
 
 ```
-GEOG 414/
+Bixi_spatial_analysis/
 ├── data_fetch.py          # BIXI data fetching module
 ├── openai_client.py       # OpenAI API integration
 ├── prompts.py             # Prompt management for GenAI
-├── arcpy_mapping.py       # ArcGIS Pro automation
+├── qgis_mapping.py        # QGIS automation (PyQGIS)
+├── arcpy_mapping.py       # ArcGIS Pro automation (ArcPy)
 ├── main_workflow.py       # Main pipeline orchestrator
+├── run_in_qgis.py         # Script to run in QGIS
+├── qgis_quick_start.py    # Quick start for QGIS
 ├── config.py              # Configuration settings
 ├── requirements.txt       # Python dependencies
-├── .env.example          # Environment variables template
-├── README.md             # This file
-├── data/                 # Fetched BIXI data (auto-created)
-└── output/               # Generated maps and analysis (auto-created)
+├── .env                   # Environment variables (your API keys)
+├── README.md              # This file
+├── data/                  # Fetched BIXI data (auto-created)
+└── output/                # Generated maps and analysis (auto-created)
 ```
 
 ## Setup
@@ -60,11 +63,16 @@ pip install -r requirements.txt
 
 3. (Optional) Configure ArcGIS Pro project path in `.env` or `config.py`
 
-### 4. ArcGIS Pro Setup
+### 4. GIS Setup (QGIS or ArcGIS Pro)
 
+**For QGIS (Recommended):**
+- Install QGIS from https://qgis.org
+- PyQGIS is automatically available in QGIS Python console
+- Run scripts from QGIS Python console: `Plugins` → `Python Console`
+
+**For ArcGIS Pro (Alternative):**
 - ArcPy is only available within ArcGIS Pro's Python environment
-- To use map creation features, run scripts from ArcGIS Pro's Python window or as a script tool
-- Alternatively, use the standalone data fetching and GenAI features outside ArcGIS Pro
+- Run scripts from ArcGIS Pro's Python window or as a script tool
 
 ## Usage
 
@@ -85,39 +93,56 @@ This will:
 2. Analyze with GenAI (if API key is set)
 3. Skip map creation (ArcPy not available)
 
-### Running With Maps (Inside ArcGIS Pro)
+### Running With Maps (Inside QGIS) - RECOMMENDED
 
 **Option 1: Quick Start (Easiest)**
 
-1. Open ArcGIS Pro and create/open a project
-2. Open Python window: `View` → `Python` (or `Ctrl+Alt+P`)
+1. Open QGIS
+2. Open Python console: `Plugins` → `Python Console` (or `Ctrl+Alt+P`)
 3. Copy and paste this:
 
 ```python
-import sys, os
-sys.path.insert(0, r'U:\GEOG414\GEOG_414_final\Bixi_spatial_analysis')
-os.chdir(r'U:\GEOG414\GEOG_414_final\Bixi_spatial_analysis')
-from main_workflow import BIXIGenAIPipeline
-pipeline = BIXIGenAIPipeline()
-results = pipeline.run_full_pipeline(use_genai=True, create_map=True)
+exec(open(r'/Users/yonganyu/Desktop/Bixi_spatial_analysis/qgis_quick_start.py').read())
 ```
 
-**Option 2: Use the Provided Script**
+**Option 2: Full Pipeline with GenAI**
 
-1. Open ArcGIS Pro
+1. Open QGIS
+2. Open Python console: `Plugins` → `Python Console`
+3. Run:
+```python
+exec(open(r'/Users/yonganyu/Desktop/Bixi_spatial_analysis/run_in_qgis.py').read())
+```
+
+**Option 3: Manual Steps**
+
+```python
+import sys, os
+sys.path.insert(0, r'/Users/yonganyu/Desktop/Bixi_spatial_analysis')
+os.chdir(r'/Users/yonganyu/Desktop/Bixi_spatial_analysis')
+
+from qgis_mapping import create_bixi_map_workflow
+from data_fetch import BIXIDataFetcher
+
+# Fetch data
+fetcher = BIXIDataFetcher()
+data = fetcher.get_combined_station_data()
+data.to_csv('data/bixi_stations.csv', index=False)
+
+# Create map
+create_bixi_map_workflow('data/bixi_stations.csv')
+```
+
+### Running With Maps (Inside ArcGIS Pro) - Alternative
+
+If you prefer ArcGIS Pro instead of QGIS:
+
+1. Open ArcGIS Pro and create/open a project
 2. Open Python window: `View` → `Python`
 3. Run:
 ```python
-exec(open(r'U:\GEOG414\GEOG_414_final\Bixi_spatial_analysis\run_in_arcgis_pro.py').read())
+exec(open(r'/Users/yonganyu/Desktop/Bixi_spatial_analysis/run_in_arcgis_pro.py').read())
 ```
-
-**Option 3: Create Script Tool**
-
-1. In ArcGIS Pro, right-click your project → `New` → `Python Script`
-2. Copy contents from `run_in_arcgis_pro.py`
-3. Run the script
-
-See `ARCGIS_PRO_GUIDE.md` for detailed instructions.
 
 ### Options
 
@@ -161,6 +186,19 @@ result = client.analyze_data(summary)
 print(result["analysis"])
 ```
 
+#### QGIS Mapping (from within QGIS Python Console)
+
+```python
+from qgis_mapping import create_bixi_map_workflow
+
+# Create map from CSV
+output_path = create_bixi_map_workflow(
+    csv_path="data/combined_stations_20240101_120000.csv",
+    layer_name="BIXI_Stations"
+)
+print(f"Map exported to: {output_path}")
+```
+
 #### ArcGIS Pro Mapping (from within ArcGIS Pro)
 
 ```python
@@ -201,7 +239,19 @@ API Base URL: `https://gbfs.velobixi.com/gbfs/2.2`
 - ArcPy code generation for custom workflows
 - Automated script creation based on requirements
 
-## ArcGIS Pro Automation
+## GIS Automation
+
+### QGIS (qgis_mapping.py)
+
+The `qgis_mapping.py` module provides:
+
+- **Layer Creation**: Create point layers from CSV with coordinates
+- **Graduated Symbology**: Color-coded visualization by utilization rate
+- **Print Layouts**: Automated layouts with title, legend, scale bar
+- **Map Export**: Export to PDF or PNG formats
+- **Interactive Mapping**: View and interact with data in QGIS canvas
+
+### ArcGIS Pro (arcpy_mapping.py)
 
 The `arcpy_mapping.py` module provides:
 
@@ -233,10 +283,15 @@ Edit `config.py` to customize:
 
 ## Troubleshooting
 
+### PyQGIS Not Available
+- PyQGIS only works within QGIS's Python console
+- Open QGIS → Plugins → Python Console
+- Data fetching and GenAI features work independently outside QGIS
+
 ### ArcPy Not Available
 - ArcPy only works within ArcGIS Pro's Python environment
-- Run scripts from ArcGIS Pro's Python window or as script tools
-- Data fetching and GenAI features work independently
+- Run scripts from ArcGIS Pro's Python window
+- Consider using QGIS instead (free and open source)
 
 ### OpenAI API Errors
 - Verify your API key in `.env`
