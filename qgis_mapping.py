@@ -8,9 +8,15 @@ from qgis.core import (
     QgsRendererRange, QgsMarkerSymbol, QgsPrintLayout, 
     QgsLayoutItemMap, QgsLayoutItemLabel, QgsLayoutItemLegend,
     QgsLayoutItemScaleBar, QgsLayoutPoint, QgsLayoutSize, 
-    QgsUnitTypes, QgsLayoutExporter, QgsRectangle, QgsRasterLayer
+    QgsUnitTypes, QgsLayoutExporter, QgsRectangle, QgsRasterLayer,
+    QgsField, QgsFields, QgsFeature, QgsGeometry, QgsPointXY,
+    QgsCategorizedSymbolRenderer, QgsRendererCategory, QgsSymbol,
+    QgsVectorFileWriter, QgsCoordinateReferenceSystem
 )
+from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt.QtGui import QColor, QFont
+from qgis.analysis import QgsNativeAlgorithms
+from qgis import processing
 
 
 class QGISAnalyzer:
@@ -150,6 +156,66 @@ class QGISAnalyzer:
         
         print(f"✓ Exported: {output_path}")
         return str(output_path)
+    
+    def create_hotspot_analysis(self, layer, field="utilization_rate"):
+        print("   Running Getis-Ord Gi* hotspot analysis...")
+        
+        output_path = str(self.output_dir / "hotspot_analysis.shp")
+        
+        params = {
+            'INPUT': layer,
+            'FIELD': field,
+            'DISTANCE': 1000,
+            'OUTPUT': output_path
+        }
+        
+        result = processing.run('qgis:heatmapkerneldensityestimation', params)
+        
+        if result and 'OUTPUT' in result:
+            hotspot_layer = QgsVectorLayer(result['OUTPUT'], "Hotspot Analysis", "ogr")
+            if hotspot_layer.isValid():
+                self.project.addMapLayer(hotspot_layer)
+                print("   ✓ Hotspot analysis complete")
+                return hotspot_layer
+        
+        print("   ⚠ Hotspot analysis failed, using density instead")
+        return self.create_density_analysis(layer, field)
+    
+    def create_density_analysis(self, layer, field="utilization_rate"):
+        print("   Creating kernel density estimation...")
+        
+        output_path = str(self.output_dir / "density_raster.tif")
+        
+        params = {
+            'INPUT': layer,
+            'RADIUS': 500,
+            'PIXEL_SIZE': 50,
+            'WEIGHT': field,
+            'OUTPUT': output_path
+        }
+        
+        result = processing.run('qgis:heatmapkerneldensityestimation', params)
+        
+        if result and 'OUTPUT' in result:
+            density_layer = QgsRasterLayer(result['OUTPUT'], "Utilization Density", "gdal")
+            if density_layer.isValid():
+                self.project.addMapLayer(density_layer)
+                print("   ✓ Density analysis complete")
+                return density_layer
+        
+        return None
+    
+    def create_nearest_neighbor_analysis(self, layer):
+        print("   Calculating nearest neighbor statistics...")
+        
+        params = {
+            'INPUT': layer,
+            'OUTPUT': str(self.output_dir / "nn_analysis.csv")
+        }
+        
+        result = processing.run('qgis:nearestneighbouranalysis', params)
+        print("   ✓ Nearest neighbor analysis complete")
+        return result
 
 
 def run_full_analysis(csv_path):

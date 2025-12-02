@@ -10,7 +10,6 @@ from openai_client import OpenAIClient
 
 QGIS_AVAILABLE = False
 GIS_ENGINE = None
-create_bixi_map_workflow = None
 
 import importlib.util
 if importlib.util.find_spec("qgis"):

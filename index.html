@@ -239,6 +239,33 @@
             cursor: not-allowed;
         }
         
+        .code-block {
+            background: #0a0a14;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #00d4ff;
+            margin: 15px 0;
+            border: 1px solid #333;
+            overflow-x: auto;
+        }
+        
+        .copy-btn {
+            padding: 10px 20px;
+            background: #9b59b6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .copy-btn:hover {
+            background: #8e44ad;
+        }
+        
         .user-location-popup {
             text-align: center;
         }
@@ -323,7 +350,7 @@
     <div class="container">
         <div class="map-section">
             <div class="header">
-                <h1>🚲 BIXI Montreal Live Map</h1>
+                <h1>🚲 BIXI Live</h1>
                 <div class="stats">
                     <div class="stat">
                         <div class="stat-value" id="total-bikes">-</div>
@@ -361,7 +388,7 @@
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div>
                         <h2>🤖 BIXI Assistant</h2>
-                        <p>Ask about stations, availability, or directions</p>
+                        <p>MICHAEL AGENT 🦖</p>
                     </div>
                     <button class="clear-btn" onclick="clearChat()">🗑️ Clear</button>
                 </div>
@@ -484,17 +511,44 @@
             btn.textContent = '⏳ Locating...';
             btn.disabled = true;
             
+            console.log('[Geolocation] Starting location request...');
+            console.log('[Geolocation] Browser support:', !!navigator.geolocation);
+            console.log('[Geolocation] Protocol:', window.location.protocol);
+            console.log('[Geolocation] Is HTTPS:', window.location.protocol === 'https:');
+            
             if (!navigator.geolocation) {
-                alert('Geolocation is not supported by your browser');
+                const errorMsg = 'Geolocation is not supported by your browser';
+                console.error('[Geolocation]', errorMsg);
+                alert(errorMsg);
                 btn.textContent = '📍 My Location';
                 btn.disabled = false;
                 return;
             }
             
+            const options = {
+                enableHighAccuracy: true,
+                timeout: 15000,
+                maximumAge: 60000
+            };
+            
+            console.log('[Geolocation] Options:', options);
+            console.log('[Geolocation] Requesting position...');
+            
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const lat = position.coords.latitude;
                     const lon = position.coords.longitude;
+                    const accuracy = position.coords.accuracy;
+                    const timestamp = new Date(position.timestamp);
+                    
+                    console.log('[Geolocation] ✓ Success!');
+                    console.log('[Geolocation] Coordinates:', lat, lon);
+                    console.log('[Geolocation] Accuracy:', accuracy, 'meters');
+                    console.log('[Geolocation] Timestamp:', timestamp.toISOString());
+                    console.log('[Geolocation] Altitude:', position.coords.altitude);
+                    console.log('[Geolocation] Heading:', position.coords.heading);
+                    console.log('[Geolocation] Speed:', position.coords.speed);
+                    
                     userLocation = { lat, lon };
                     
                     if (userMarker) {
@@ -542,27 +596,41 @@
                     document.getElementById('chat-input').value = `I'm at coordinates ${lat.toFixed(4)}, ${lon.toFixed(4)}. Where can I find a bike nearby?`;
                 },
                 (error) => {
+                    console.error('[Geolocation] ✗ Error occurred');
+                    console.error('[Geolocation] Error code:', error.code);
+                    console.error('[Geolocation] Error message:', error.message);
+                    
                     let message = 'Unable to get your location';
+                    let details = '';
+                    
                     switch(error.code) {
                         case error.PERMISSION_DENIED:
-                            message = 'Location permission denied. Please allow location access.';
+                            message = 'Location permission denied';
+                            details = 'Please allow location access in your browser settings. Check the address bar for a location icon.';
+                            console.error('[Geolocation] User denied location permission');
                             break;
                         case error.POSITION_UNAVAILABLE:
-                            message = 'Location information unavailable.';
+                            message = 'Location information unavailable';
+                            details = 'Your device could not determine your location. Try:\n• Moving to an area with better GPS/WiFi signal\n• Checking if location services are enabled on your device\n• Refreshing the page and trying again';
+                            console.error('[Geolocation] Position unavailable - GPS/WiFi may be off or signal too weak');
                             break;
                         case error.TIMEOUT:
-                            message = 'Location request timed out.';
+                            message = 'Location request timed out';
+                            details = 'The request took too long. Try:\n• Moving to an area with better signal\n• Checking your internet connection\n• Clicking "My Location" again';
+                            console.error('[Geolocation] Request timed out after 15 seconds');
                             break;
+                        default:
+                            details = `Error code: ${error.code}, Message: ${error.message}`;
+                            console.error('[Geolocation] Unknown error:', error);
                     }
-                    alert(message);
+                    
+                    console.error('[Geolocation] Full error object:', error);
+                    
+                    alert(`${message}\n\n${details}\n\nCheck browser console (F12) for more details.`);
                     btn.textContent = '📍 My Location';
                     btn.disabled = false;
                 },
-                {
-                    enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 0
-                }
+                options
             );
         }
         
